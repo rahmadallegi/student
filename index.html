@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Academic Database</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+    <header>
+        <h1>&#127979; Student Academic Database</h1>
+        <p>Comprehensive records including academic performance, work experience &amp; English proficiency</p>
+        <div class="header-stats">
+            <div class="header-stat">
+                <div class="val" id="hdr-total">—</div>
+                <div class="lbl">Students</div>
+            </div>
+            <div class="header-stat">
+                <div class="val" id="hdr-avg-gpa">—</div>
+                <div class="lbl">Avg GPA</div>
+            </div>
+            <div class="header-stat">
+                <div class="val" id="hdr-majors">—</div>
+                <div class="lbl">Majors</div>
+            </div>
+            <div class="header-stat">
+                <div class="val" id="hdr-universities">—</div>
+                <div class="lbl">Universities</div>
+            </div>
+            <div class="header-stat">
+                <div class="val" id="hdr-with-exp">—</div>
+                <div class="lbl">Have Work Exp</div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <button class="active" onclick="switchTab('overview')">&#128200; Overview</button>
+        <button onclick="switchTab('students')">&#128101; Students</button>
+        <button onclick="switchTab('academics')">&#127891; Academics</button>
+        <button onclick="switchTab('english')">&#127760; English Scores</button>
+        <button onclick="switchTab('work')">&#128188; Work Experience</button>
+    </nav>
+
+    <main>
+
+        <!-- ══ OVERVIEW ══ -->
+        <div id="tab-overview" class="section active">
+            <div class="grid-4 section-gap" id="kpi-row"></div>
+
+            <div class="grid-2 section-gap">
+                <div class="card">
+                    <h2><span class="icon">&#127891;</span> Students by Major</h2>
+                    <div class="chart-wrap"><canvas id="chart-major"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#127970;</span> Students by University</h2>
+                    <div class="chart-wrap"><canvas id="chart-uni"></canvas></div>
+                </div>
+            </div>
+
+            <div class="grid-2 section-gap">
+                <div class="card">
+                    <h2><span class="icon">&#128200;</span> GPA Distribution</h2>
+                    <div class="chart-wrap"><canvas id="chart-gpa-dist"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#127760;</span> English Test Distribution</h2>
+                    <div class="chart-wrap"><canvas id="chart-eng-test"></canvas></div>
+                </div>
+            </div>
+
+            <div class="grid-2 section-gap">
+                <div class="card">
+                    <h2><span class="icon">&#127775;</span> Enrollment Status</h2>
+                    <div class="chart-wrap"><canvas id="chart-status"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#128188;</span> Work Experience Count</h2>
+                    <div class="chart-wrap"><canvas id="chart-work-count"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ STUDENTS ══ -->
+        <div id="tab-students" class="section">
+            <div class="toolbar">
+                <input type="text" id="search-input" placeholder="&#128269; Search by name, major, university..."
+                    oninput="filterStudents()" />
+                <select id="filter-major" onchange="filterStudents()">
+                    <option value="">All Majors</option>
+                </select>
+                <select id="filter-status" onchange="filterStudents()">
+                    <option value="">All Statuses</option>
+                    <option value="Graduated">Graduated</option>
+                    <option value="Enrolled">Enrolled</option>
+                </select>
+                <button class="btn btn-primary" onclick="openAddStudentModal()">+ Add Student</button>
+                <span class="count" id="student-count"></span>
+            </div>
+            <div class="grid-auto" id="student-grid"></div>
+        </div>
+
+        <!-- ══ ACADEMICS ══ -->
+        <div id="tab-academics" class="section">
+            <div class="grid-2 section-gap">
+                <div class="card">
+                    <h2><span class="icon">&#128200;</span> Average GPA by Major</h2>
+                    <div class="chart-wrap"><canvas id="chart-gpa-major"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#127891;</span> Degree Types</h2>
+                    <div class="chart-wrap"><canvas id="chart-degree"></canvas></div>
+                </div>
+            </div>
+            <div class="grid-2 section-gap">
+                <div class="card">
+                    <h2><span class="icon">&#127775;</span> Honors &amp; Awards</h2>
+                    <div class="chart-wrap"><canvas id="chart-honors"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#128218;</span> Credits Completed Distribution</h2>
+                    <div class="chart-wrap"><canvas id="chart-credits"></canvas></div>
+                </div>
+            </div>
+            <div class="card mt-6">
+                <h2><span class="icon">&#128203;</span> Full Academic Records</h2>
+                <div class="table-wrap">
+                    <table id="academic-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>University</th>
+                                <th>Major</th>
+                                <th>Degree</th>
+                                <th>GPA</th>
+                                <th>Credits</th>
+                                <th>Grad Year</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="academic-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ ENGLISH ══ -->
+        <div id="tab-english" class="section">
+            <div class="grid-3 section-gap">
+                <div class="card">
+                    <h2><span class="icon">&#127760;</span> Score by Test Type</h2>
+                    <div class="chart-wrap"><canvas id="chart-eng-scores"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#127775;</span> Proficiency Levels</h2>
+                    <div class="chart-wrap"><canvas id="chart-eng-level"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#128200;</span> Score vs GPA</h2>
+                    <div class="chart-wrap"><canvas id="chart-eng-gpa"></canvas></div>
+                </div>
+            </div>
+            <div class="card mt-6">
+                <h2><span class="icon">&#128203;</span> English Score Records</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Test</th>
+                                <th>Score</th>
+                                <th>Level</th>
+                                <th>Date Taken</th>
+                                <th>Major</th>
+                            </tr>
+                        </thead>
+                        <tbody id="english-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ WORK EXPERIENCE ══ -->
+        <div id="tab-work" class="section">
+            <div class="grid-2 section-gap">
+                <div class="card">
+                    <h2><span class="icon">&#127970;</span> Top Employers</h2>
+                    <div class="chart-wrap"><canvas id="chart-employers"></canvas></div>
+                </div>
+                <div class="card">
+                    <h2><span class="icon">&#128188;</span> Top Job Titles</h2>
+                    <div class="chart-wrap"><canvas id="chart-titles"></canvas></div>
+                </div>
+            </div>
+            <div class="card mt-6">
+                <h2><span class="icon">&#128203;</span> Work Experience Records</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Title</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="work-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-name">Student Name</h2>
+                    <p id="modal-sub">Details</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="modal-edit-btn" class="modal-action" style="display:none;">Edit</button>
+                    <button id="modal-delete-btn" class="modal-action danger" style="display:none;">Delete</button>
+                    <button class="modal-close" onclick="closeModalDirect()">&#10005;</button>
+                </div>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
